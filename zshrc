@@ -3,7 +3,7 @@
 # ------------------------------------
 
 # Get latest container ID
-alias dl="docker ps -l -q"
+alias dl="docker ps -l -q | tee >(xsel)"
 
 # Get container process
 alias dps="docker ps"
@@ -15,7 +15,7 @@ alias dpa="docker ps -a"
 alias di="docker images"
 
 # Get container IP
-alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+dip() { docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1 | tee >(xsel); }
 
 # Run deamonized container, e.g., $dkd base /bin/echo hello
 alias dkd="docker run -d -P"
@@ -46,3 +46,7 @@ dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/[
 
 # Bash into running container
 dbash() { docker exec -it $(docker ps -aqf "name=$1") bash; }
+
+# Bash into last container
+dlast() { docker exec -it $(docker ps -l -q) bash; }
+
