@@ -4,18 +4,31 @@
 
 # Get latest container ID
 alias dl="docker ps -l -q | tee >(xsel)"
+alias dpslast="docker ps -l -q | tee >(xsel)"
 
 # Get container process
 alias dps="docker ps"
 
 # Get process included stop container
-alias dpa="docker ps -a"
+alias dpsa="docker ps -a"
 
 # Get images
 alias di="docker images"
 
 # Get container IP
-dip() { docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1 | tee >(xsel); }
+dip() { 
+	image_name=`docker inspect --format '{{ .Config.Image }}' $1`
+	echo "Getting IP of docker id=$1 image=$image_name"
+	docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1 | tee >(xsel); 
+}
+
+# Get container IP of last container
+diplast() { 
+	last=`docker ps -l -q`
+	image_name=`docker inspect --format '{{ .Config.Image }}' $last;`
+	echo "Getting IP of docker id=$last image=$image_name"
+	docker inspect --format '{{ .NetworkSettings.IPAddress }}' $last | tee >(xsel); 
+}
 
 # Run deamonized container, e.g., $dkd base /bin/echo hello
 alias dkd="docker run -d -P"
@@ -49,4 +62,3 @@ dbash() { docker exec -it $(docker ps -aqf "name=$1") bash; }
 
 # Bash into last container
 dlast() { docker exec -it $(docker ps -l -q) bash; }
-
