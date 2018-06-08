@@ -40,7 +40,7 @@ alias dki="docker run -i -t -P"
 alias dex="docker exec -i -t"
 
 # Stop all containers
-dstop() { docker stop $(docker ps -a -q); }
+dstopall() { docker stop $(docker ps -a -q); }
 
 # Remove all containers
 drm() { docker rm $(docker ps -a -q); }
@@ -62,3 +62,15 @@ dbash() { docker exec -it $(docker ps -aqf "name=$1") bash; }
 
 # Bash into last container
 dlast() { docker exec -it $(docker ps -l -q) bash; }
+
+# Stop last running container
+dslast() {
+	last=`docker ps -l -q`
+	docker stop $last
+}
+
+# Kill last running container
+dklast() {
+	last=`docker ps -l -q`
+	docker kill $last
+}
