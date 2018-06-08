@@ -19,14 +19,14 @@ dip() {
 	image_name=`docker inspect --format '{{ .Config.Image }}' $1`
 	echo "Getting IP of docker id=$1 image=$image_name"
 	docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1 | tee >(xsel); 
+	echo "Listening on ports:"
+	docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' $1
 }
 
 # Get container IP of last container
 diplast() { 
 	last=`docker ps -l -q`
-	image_name=`docker inspect --format '{{ .Config.Image }}' $last;`
-	echo "Getting IP of docker id=$last image=$image_name"
-	docker inspect --format '{{ .NetworkSettings.IPAddress }}' $last | tee >(xsel); 
+	dip $last
 }
 
 # Run deamonized container, e.g., $dkd base /bin/echo hello
