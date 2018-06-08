@@ -3,7 +3,6 @@
 # ------------------------------------
 
 # Get latest container ID
-alias dl="docker ps -l -q | tee >(xsel)"
 alias dpslast="docker ps -l -q | tee >(xsel)"
 
 # Get container process
@@ -37,7 +36,15 @@ alias dkd="docker run -d -P"
 alias dki="docker run -i -t -P"
 
 # Execute interactive container, e.g., $dex base /bin/bash
-alias dex="docker exec -i -t"
+alias dexec="docker exec -i -t"
+
+# Execute interactive container, e.g., $dex base /bin/bash
+dexeclast() {
+	last=`docker ps -l -q`
+	image_name=`docker inspect --format '{{ .Config.Image }}' $last;`
+	echo "Executing on docker id=$last image=$image_name commands $@"
+	docker exec -i -t $last $@
+}
 
 # Stop all containers
 dstopall() { docker stop $(docker ps -a -q); }
