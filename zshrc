@@ -3,7 +3,8 @@
 # ------------------------------------
 
 # Get latest container ID
-alias dpslast="docker ps -l -q | tee >(xsel)"
+alias dpslast-nc="docker ps -l -q"
+alias dpslast="docker ps -l -q | tee >(tr -d '\n' |xsel)"
 
 # Get container process
 alias dps="docker ps"
@@ -18,16 +19,14 @@ alias di="docker images"
 dip() { 
 	image_name=`docker inspect --format '{{ .Config.Image }}' $1`
 	echo "Getting IP of docker id=$1 image=$image_name"
-	docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1 | tee >(xsel); 
+	docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1
+	docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1 | tr  -d '\n' | xsel; 
 	echo "Listening on ports:"
 	docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' $1
 }
 
 # Get container IP of last container
-diplast() { 
-	last=`docker ps -l -q`
-	dip $last
-}
+alias diplast="dip $(dpslast-nc)"
 
 # Run deamonized container, e.g., $dkd base /bin/echo hello
 alias dkd="docker run -d -P"
@@ -81,3 +80,7 @@ dklast() {
 	last=`docker ps -l -q`
 	docker kill $last
 }
+
+alias dconfig="docker inspect --format=='{{json .Config}}'"
+
+alias dconfiglast="dconfig $(dpslast-nc)"
