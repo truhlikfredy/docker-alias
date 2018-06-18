@@ -84,3 +84,18 @@ dklast() {
 alias dconfig="docker inspect --format=='{{json .Config}}'"
 
 alias dconfiglast="dconfig $(dpslast-nc)"
+
+# Show IPs of all running containers
+dipall() {
+    IDs=`docker ps -q`
+    for ID in $IDs
+    do
+        image_name=`docker inspect --format '{{ .Config.Image }}' $ID`
+        alias_name=`docker inspect --format '{{ .Name }}' $ID`
+        ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' $ID`
+        ports=`docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' $ID`
+        echo "docker id=$ID image=$image_name name=$alias_name ip=$ip ports=$ports"
+        echo  
+    done
+}
+
